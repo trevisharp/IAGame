@@ -2,11 +2,8 @@ using System.Drawing;
 
 public class EdPlayer : Player
 {
-    public EdPlayer(PointF location) : base(location) 
-    {
-        PrimaryColor = Color.Red;
-        SecundaryColor = Color.Blue;
-    }
+    public EdPlayer(PointF location) : 
+        base(location, Color.Red, Color.Blue, "Trevisan") { }
 
     int searchindex = 0;
     int frame = 0;

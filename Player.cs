@@ -4,12 +4,20 @@ using System.Drawing;
 
 public abstract class Player
 {
-    public Player(PointF location)
+    public Player(PointF location, Color primary, Color secundary, string name)
     {
         this.Location = location;
+        this.primarycolor = primary;
+        this.secundarycolor = secundary;
+        this.name = name;
     }
-    public Color PrimaryColor { get; set; } = Color.White;
-    public Color SecundaryColor { get; set; } = Color.Black;
+
+    private readonly Color primarycolor = Color.Blue;
+    private readonly Color secundarycolor = Color.Blue;
+    private readonly string name = "robo sem nome";
+    public Color PrimaryColor => primarycolor;
+    public Color SecundaryColor => secundarycolor;
+    public string Name => name;
     public bool IsBroked { get; private set; } = false;
     public int Points { get; private set; } = 0;
     public double Energy { get; private set; } = 100;
@@ -132,22 +140,38 @@ public abstract class Player
 
     public void Draw(Graphics g)
     {
-        g.FillEllipse(new SolidBrush(this.PrimaryColor),
+        Color darkpc = Color.FromArgb(
+            4 * this.PrimaryColor.R / 10,
+            4 * this.PrimaryColor.G / 10,
+            4 * this.PrimaryColor.B / 10
+        );
+        Color darksc = Color.FromArgb(
+            4 * this.SecundaryColor.R / 10,
+            4 * this.SecundaryColor.G / 10,
+            4 * this.SecundaryColor.B / 10
+        );
+        g.FillEllipse(new SolidBrush(darkpc),
             this.Location.X - 20, this.Location.Y - 20,
             40, 40);
-        g.FillEllipse(new SolidBrush(this.SecundaryColor), 
+        g.FillPie(new SolidBrush(this.PrimaryColor),
+            this.Location.X - 20, this.Location.Y - 20,
+            40, 40, 0f, 360f * (float)Life / 100);
+        g.FillEllipse(new SolidBrush(darksc), 
             this.Location.X - 10, this.Location.Y - 10,
             20, 20);
+        g.FillPie(new SolidBrush(this.SecundaryColor), 
+            this.Location.X - 10, this.Location.Y - 10,
+            20, 20, 0f, 360f * (float)Energy / 100);
         g.DrawEllipse(Pens.Black, 
             this.Location.X - 20, this.Location.Y - 20,
             40, 40);
-        g.DrawString(Energy.ToString("00"), SystemFonts.CaptionFont, Brushes.White, 
-            new RectangleF(this.Location.X - 20, this.Location.Y - 20, 40, 40),
-            new StringFormat()
-            {
-                Alignment = StringAlignment.Center,
-                LineAlignment = StringAlignment.Center
-            });
+        // g.DrawString(Energy.ToString("00"), SystemFonts.CaptionFont, Brushes.White, 
+        //     new RectangleF(this.Location.X - 20, this.Location.Y - 20, 40, 40),
+        //     new StringFormat()
+        //     {
+        //         Alignment = StringAlignment.Center,
+        //         LineAlignment = StringAlignment.Center
+        //     });
     }
 
     public void ReciveDamage(PointF bomb)
@@ -278,7 +302,7 @@ public abstract class Player
             allbombs.Add(new Bomb()
             {
                 Location = this.Location + speed,
-                Speed = speed
+                Speed = 3f * speed
             });
         }
 

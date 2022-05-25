@@ -2,11 +2,8 @@ using System.Drawing;
 
 public class TreviPlayer : Player
 {
-    public TreviPlayer(PointF location) : base(location) 
-    {
-        PrimaryColor = Color.Green;
-        SecundaryColor = Color.Purple;
-    }
+    public TreviPlayer(PointF location) : 
+        base(location, Color.Green, Color.Purple, "Trevisan") { }
 
     int i = 0;
     PointF? enemy = null;
