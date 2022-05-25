@@ -24,7 +24,6 @@ public class EdPlayer : Player
         else if (EntitiesInAccurateSonar.Count == 0)
         {
             AccurateSonar();
-            StartMove(new PointF(1f, 0));
         }
         else if (FoodsInInfraRed.Count == 0)
         {
@@ -35,6 +34,7 @@ public class EdPlayer : Player
             StartMove(FoodsInInfraRed[0]);
             if (Points != points)
             {
+                StartTurbo();
                 StrongSonar();
                 StopMove();
                 ResetInfraRed();

@@ -16,12 +16,12 @@ public class Bomb
             if (player.IsBroked)
                 continue;
             var rect = new RectangleF(
-                player.Location.X - 20, 
-                player.Location.Y - 20,
-                40, 40);
+                player.Location.X - 25, 
+                player.Location.Y - 25,
+                50, 50);
             if (rect.Contains(this.Location))
             {
-                player.ReciveDamage();
+                player.ReciveDamage(this.Location);
                 return false;
             }
         }

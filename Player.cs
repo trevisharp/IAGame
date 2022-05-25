@@ -14,16 +14,17 @@ public abstract class Player
     public int Points { get; private set; } = 0;
     public double Energy { get; private set; } = 100;
     public double MaxEnergy { get; private set; } = 100;
-    public double EnergyRegeneration { get; private set; } = 1;
+    public double EnergyRegeneration { get; private set; } = 2;
     public double Life { get; private set; } = 100;
     public double MaxLife { get; private set; } = 100;
-    public double LifeRegeneration { get; private set; } = 1;
+    public double LifeRegeneration { get; private set; } = 2;
     public List<PointF> EntitiesInAccurateSonar { get; private set; } = new List<PointF>();
     public int EntitiesInStrongSonar { get; private set; } = 0;
     public List<PointF> EnemiesInInfraRed { get; private set; } = new List<PointF>();
     public List<PointF> FoodsInInfraRed { get; private set; } = new List<PointF>();
     public PointF Location { get; private set; }
     public SizeF Velocity { get; private set; } = SizeF.Empty;
+    public PointF? LastDamage { get; private set; } = null;
 
     private bool accuratesonaron = false;
     private bool strongsonaron = false;
@@ -31,6 +32,9 @@ public abstract class Player
     private PointF? infraredsensorpoint = null;
     private bool shooting = false;
     private PointF? shootingpoint = null;
+    private bool infrareset = false;
+    private bool sonarreset = false;
+    private bool turbo = false;
 
     public void Broke()
     {
@@ -82,6 +86,8 @@ public abstract class Player
     {
         p = new PointF(p.X - Location.X, p.Y - Location.Y);
         float mod = (float)Math.Sqrt(p.X * p.X + p.Y * p.Y);
+        if (mod == 0)
+            Velocity = SizeF.Empty;
         Velocity = new SizeF(p.X / mod, p.Y / mod);
     }
 
@@ -99,6 +105,16 @@ public abstract class Player
         StartMove(direction);
     }
 
+    public void StartTurbo()
+    {
+        turbo = true;
+    }
+
+    public void EndTurbo()
+    {
+        turbo = false;
+    }
+
     public void StopMove()
     {
         Velocity = SizeF.Empty;
@@ -106,14 +122,12 @@ public abstract class Player
 
     public void ResetInfraRed()
     {
-        EnemiesInInfraRed.Clear();
-        FoodsInInfraRed.Clear();
+        infrareset = true;
     }
 
     public void ResetSonar()
     {
-        EntitiesInStrongSonar = 0;
-        EntitiesInAccurateSonar.Clear();
+        sonarreset = true;
     }
 
     public void Draw(Graphics g)
@@ -127,11 +141,19 @@ public abstract class Player
         g.DrawEllipse(Pens.Black, 
             this.Location.X - 20, this.Location.Y - 20,
             40, 40);
+        g.DrawString(Energy.ToString("00"), SystemFonts.CaptionFont, Brushes.White, 
+            new RectangleF(this.Location.X - 20, this.Location.Y - 20, 40, 40),
+            new StringFormat()
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center
+            });
     }
 
-    public void ReciveDamage()
+    public void ReciveDamage(PointF bomb)
     {
         Life -= 20;
+        this.LastDamage = bomb;
     }
 
     public void Loop(Graphics g, float dt, 
@@ -144,8 +166,9 @@ public abstract class Player
 
         if (accuratesonaron)
         {
+            EntitiesInAccurateSonar.Clear();
             accuratesonaron = false;
-            this.Energy -= 5;
+            Energy -= 10 * dt;
             EntitiesInAccurateSonar.Clear();
             foreach (var player in allplayers)
             {
@@ -175,7 +198,7 @@ public abstract class Player
         if (strongsonaron)
         {
             strongsonaron = false;
-            Energy -= 5;
+            Energy -= 10 * dt;
             EntitiesInStrongSonar = 0;
             foreach (var player in allplayers)
             {
@@ -204,7 +227,9 @@ public abstract class Player
 
         if (infraredsensoron)
         {
-            Energy -= 5;
+            EnemiesInInfraRed.Clear();
+            FoodsInInfraRed.Clear();
+            Energy -= 10 * dt;
             infraredsensoron = false;
             float isdx = infraredsensorpoint.Value.X - this.Location.X,
                   isdy = infraredsensorpoint.Value.Y - this.Location.Y;
@@ -244,7 +269,7 @@ public abstract class Player
 
         if (shooting)
         {
-            Energy -= 5;
+            Energy -= 10 * dt;
             shooting = false;
             SizeF speed = new SizeF(shootingpoint.Value.X -this.Location.X,
                 shootingpoint.Value.Y -this.Location.Y);
@@ -255,6 +280,20 @@ public abstract class Player
                 Location = this.Location + speed,
                 Speed = speed
             });
+        }
+
+        if (infrareset)
+        {
+            infrareset = false;
+            EnemiesInInfraRed.Clear();
+            FoodsInInfraRed.Clear();
+        }
+
+        if (sonarreset)
+        {
+            sonarreset = false;
+            EntitiesInStrongSonar = 0;
+            EntitiesInAccurateSonar.Clear();
         }
 
         for (int f = 0; f < allfoods.Count; f++)
@@ -268,16 +307,17 @@ public abstract class Player
                 allfoods.RemoveAt(f);
                 f--;
                 this.Points++;
+                this.LifeRegeneration += .5f;
+                this.EnergyRegeneration += .5f;
             }
         }
 
-        Location += 50f * Velocity * dt;
-        Energy += EnergyRegeneration;
-        if (Velocity.Width != 0f && Velocity.Height != 0f)
-            Energy -= 1f;
+        Location += (turbo ? 2f : 1f) * 50f * Velocity * dt;
+        Energy += EnergyRegeneration * dt;
+        Energy -= (turbo ? 2f : 1f) * (Velocity.IsEmpty ? 1f : 0f) * dt;
         if (Energy > MaxEnergy)
             Energy = MaxEnergy;
-        Life += LifeRegeneration;
+        Life += LifeRegeneration * dt;
         if (Life > MaxLife)
             Life = MaxLife;
         if (Energy < 0 || Life < 0)
