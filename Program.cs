@@ -3,7 +3,9 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
 
-ApplicationConfiguration.Initialize();
+Application.SetHighDpiMode(HighDpiMode.SystemAware);
+Application.EnableVisualStyles();
+Application.SetCompatibleTextRenderingDefault(false);
 
 List<Player> players = new List<Player>();
 List<PointF> foods = new List<PointF>();
