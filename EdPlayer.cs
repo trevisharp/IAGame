@@ -3,7 +3,7 @@ using System.Drawing;
 public class EdPlayer : Player
 {
     public EdPlayer(PointF location) : 
-        base(location, Color.Red, Color.Blue, "Trevisan") { }
+        base(location, Color.Red, Color.Blue, "Edjalma") { }
 
     int searchindex = 0;
     int frame = 0;
