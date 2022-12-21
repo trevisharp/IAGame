@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 public abstract class Player
 {
@@ -187,6 +188,9 @@ public abstract class Player
         List<Player> allplayers, List<PointF> allfoods, 
         List<Bomb> allbombs, int i)
     {
+        allplayers = allplayers
+            .Where(p => !p.IsBroked)
+            .ToList();
         float dx, dy;
         loop();
         Draw(g);
