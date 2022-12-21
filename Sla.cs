@@ -11,8 +11,16 @@ public class Sla : Player
     int stop = 0;
     private PointF? target = null;
     PointF ponto = new PointF();
+    PointF? flagDamage = null;
     protected override void loop()
     {
+        if (flagDamage != LastDamage)
+        {
+            float x = LastDamage.Value.X - this.Location.X;
+            float y = LastDamage.Value.Y - this.Location.Y;
+            StartTurbo();
+            StartMove(new PointF(-x, -y));
+        }
         if (target == null)
         {
             if (frame % 5 == 0)
