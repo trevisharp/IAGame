@@ -168,7 +168,7 @@ public abstract class Player
         g.DrawEllipse(Pens.Black, 
             this.Location.X - 20, this.Location.Y - 20,
             40, 40);
-        g.DrawString(Energy.ToString(), SystemFonts.CaptionFont, Brushes.Black, 
+        g.DrawString(name, SystemFonts.CaptionFont, Brushes.Black, 
             new RectangleF(this.Location.X - 40, this.Location.Y - 40, 80, 20),
             new StringFormat()
             {
@@ -334,8 +334,8 @@ public abstract class Player
                 allfoods.RemoveAt(f);
                 f--;
                 this.Points++;
-                this.LifeRegeneration += .5f;
-                this.EnergyRegeneration += .5f;
+                this.LifeRegeneration += .25f;
+                this.EnergyRegeneration += .25f;
             }
         }
 
@@ -343,9 +343,9 @@ public abstract class Player
         Energy += EnergyRegeneration * dt;
         if (moving)
         {
-            Energy -= dt;
+            Energy -= 2 * dt;
             if (turbo)
-                Energy -= dt;
+                Energy -= 2 * dt;
         }
         if (Energy > MaxEnergy)
             Energy = MaxEnergy;

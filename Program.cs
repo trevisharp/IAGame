@@ -64,7 +64,7 @@ tm.Tick += delegate
             player.Loop(g, .025f, players, foods, bombs, frame);
     }
     
-    if (frame % 10 == 0)
+    if (foods.Count < 40)
         foods.Add(new PointF(rand.Next(form.Width), rand.Next(form.Height)));
     foreach (var food in foods)
     {
