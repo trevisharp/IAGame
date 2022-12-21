@@ -1,90 +1,64 @@
-// using System.Drawing;
+using System;
+using System.Drawing;
+using System.Linq;
 
-// public class Eva : Player
-// {
-//     public Eva(PointF location) :
-//         base(location, Color.Purple, Color.White, "Eva")
-//     { }
+public class Atirante : Player
+{
+    public Random rand { get; set; } = new Random();
+    public PointF dest { get; private set; }
+    public int frame { get; set; }
+    public bool isLoading { get; set; } = false;
+    public Atirante(PointF location) :
+        base(location, Color.Purple, Color.White, "Malvadão")
+    { this.dest = new PointF((int)rand.NextInt64(0, 1200),(int)rand.NextInt64(0, 800)); }
 
-//     int searchindex = 0;
-//     int frame = 0;
-//     int points = 0;
-//     int i = 0;
-//     PointF? enemy = null;
-//     bool isloading = false;
-//     protected override void loop()
-//     {
-//         frame++;
-//         if (EnemiesInInfraRed.Count > 0)
-//         {
-//             enemy = EnemiesInInfraRed[0];
-//         }
-//         else
-//         {
-//             enemy = null;
-//         }
-//         if (Energy < 10)
-//         {
-//             StopMove();
-//             isloading = true;
-//             enemy = null;
-//         }
-//         if (isloading)
-//         {
-//             if (Energy > 40)
-//                 isloading = false;
-//             else return;
-//         }
-//         if (enemy == null && Energy > 10)
-//             InfraRedSensor(5f * i++);
-//         else if (enemy != null && Energy > 5)
-//         {
-//             InfraRedSensor(enemy.Value);
-//             float dx = enemy.Value.X - this.Location.X,
-//                   dy = enemy.Value.Y - this.Location.Y;
-//             if (dx * dx + dy * dy >= 300f * 300f)
-//                 StartMove(enemy.Value);
-//             else
-//             {
-//                 StopMove();
-//                 if (i++ % 3 == 0)
-//                     Shoot(enemy.Value);
-//             }
-//         }
-//         if (EntitiesInStrongSonar == 0)
-//         {
-//             StrongSonar();
-//             points = Points;
-//         }
-//         else if (EntitiesInAccurateSonar.Count == 0 && EnemiesInInfraRed.Count == 0)
-//         {
-//             AccurateSonar();
-//         }
-//         else if (FoodsInInfraRed.Count == 0 && EntitiesInAccurateSonar.Count != 0)
-//         {
-//             InfraRedSensor(EntitiesInAccurateSonar[searchindex++ % EntitiesInAccurateSonar.Count]);
-//         }
-//         else
-//         {
-//             if (FoodsInInfraRed.Count > 0)
-//             {
-//                 StartMove(FoodsInInfraRed[0]);
-//                 if (Points != points)
-//                 {
-//                     StartTurbo();
-//                     StrongSonar();
-//                     StopMove();
-//                     ResetInfraRed();
-//                     ResetSonar();
-//                 }
-//             }
-//         }
+    protected override void loop()
+    {
+        if (isLoading)
+        {
+            if (this.Energy > 30)
+                isLoading = false;
+            return;
+        }
 
+        PointF? enemy = null;
+        if (EnemiesInInfraRed.Count > 0)
+            enemy = EnemiesInInfraRed[0];
+        else
+            enemy = null;
+        
+        if (this.Location.X == dest.X && this.Location.Y == dest.Y)
+            dest = new PointF((int)rand.NextInt64(0, 1200),(int)rand.NextInt64(0, 800));
+        
+        if (this.Energy > 5)
+        {
+            if (enemy == null)
+                InfraRedSensor((int)rand.NextInt64(0, 306));
+            if (EnemiesInInfraRed.Count > 0)
+            {
+                Shoot(EnemiesInInfraRed[0]);
+                enemy = EnemiesInInfraRed[0];
+            }
 
+            StartMove(dest);
+            PointF ponto = new PointF((int)rand.NextInt64(), (int)rand.NextInt64());
+            Shoot(ponto);
+        }
+        else
+        {
+            StopMove();
+            isLoading = true;
+        }
+        frame++;
+    }
 
+    private double hip(double X, double Y)
+    {
+        double difX = this.Location.X - X;
+        double difY = this.Location.Y - Y;
 
+        double catetosAoQuadrado = Math.Pow(difX, 2) + Math.Pow(difY, 2); 
 
-
-
-//     }
-// }
+        return Math.Pow(catetosAoQuadrado, 0.5);
+    }
+}
