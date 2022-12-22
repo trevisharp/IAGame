@@ -9,6 +9,8 @@ public class JirayaPlayer : Player
         base(location, Color.DeepPink, Color.White, "Nova Era")
     { this.dest = new PointF((int)rand.NextInt64(0, 1200), (int)rand.NextInt64(0, 800)); }
 
+
+    int parado = 0;
     int frame = 0;
     int searchindex = 0;
     int points = 0;
@@ -18,14 +20,15 @@ public class JirayaPlayer : Player
     PointF? enemy = null;
     bool isloading = false;
     int giro = 0;
-    PointF topLeft = new PointF(0, 0);
+    PointF topLeft = new PointF(50, 50);
 
     protected override void loop()
     {
         StartMove(topLeft);
-        
+        var local = Location;
         if (Energy > 10)
         {
+            
 
             // if (FoodsInInfraRed.Count > 0 && EnemiesInInfraRed.Count > 0) 
             // {
@@ -78,7 +81,7 @@ public class JirayaPlayer : Player
                 {
 
                 }
-                else if (firecount < 15)
+                else if (firecount < 8)
                 {
                     Shoot(enemy.Value);
                     firecount++;
@@ -96,7 +99,7 @@ public class JirayaPlayer : Player
             }
         }
 
-        else if (Energy < 10)
+        else if (Energy < 20 || Location == topLeft)
         {
             StopMove();
             if (Energy > 10)
@@ -129,14 +132,15 @@ public class JirayaPlayer : Player
                     {
 
                     }
-                    else if (firecount < 15)
+                    else if (firecount < 5)
                     {
                         Shoot(enemy.Value);
                         firecount++;
                     }
                     contador++;
                     i++;
-                    if (contador == 15)
+                    local = Location;
+                    if (contador == 1)
                     {
                         enemy = null;
                         firecount = 0;
@@ -148,6 +152,18 @@ public class JirayaPlayer : Player
 
             }
         }
+        else if ((local.X - Location.X) * (local.X - Location.X) + (local.Y - Location.Y) * (local.Y - Location.Y) < 15f)
+        {
+            parado++;
+
+            if (parado > 10)
+            {
+                StartMove(FoodsInInfraRed[0]);
+                parado = 0;
+            }
+                
+        }
+        
     }
 
 }
