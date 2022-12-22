@@ -10,22 +10,28 @@ public class PedreslaPlayer : Player
     int frame = 0;
     int countShoot = 0;
     private PointF? target = null;
-    private PointF? targetshot = null;
+    private PointF? temptarget = null;
     PointF ponto = new PointF();
     PointF? flagDamage = null;
+
+    public PointF? valor = null;
+
+    int points = 0;
 
     int timestopped = 0;
 
     int searchindex = 0;
-    int points = 0;
     bool reset = true;
     bool sonarrunning = false;
     bool isfood = false;
     bool foodpcrl = false;
+    bool attack = false;
+
+
+    int lastlife;
 
     protected override void loop()
     {
-
         frame++;
 
 
@@ -62,8 +68,15 @@ public class PedreslaPlayer : Player
 
 
 
+    // points = this.Points;
 
+
+
+    // if (points % 3 == 0 && points !=0)
+    // {
+    //     attack = true;
     // }
+    // // }
 
     if(sonarrunning)
     {
@@ -76,13 +89,13 @@ public class PedreslaPlayer : Player
         
 
         if (target == null)
-            InfraRedSensor(5f * frame++);
+            InfraRedSensor(4f * frame++);
         
         else
         {
             sonarrunning = false;
             timestopped = 0;
-
+            attack = false;
         }
     }
         
@@ -137,17 +150,20 @@ public class PedreslaPlayer : Player
         {
 
 
-                if(countShoot <= 10 && !foodpcrl)
+                if(countShoot <= 20 && !foodpcrl)
                 {
-                    if (frame % 2 == 0)
+                    StopTurbo();
+                    if (frame % 4 == 0)
                     {
+                        StopTurbo();
                         Shoot(target.Value);
                         countShoot++;
                     }
                 }
 
-                if(countShoot >= 10)
+                if(countShoot >= 20)
                 {
+                    StopTurbo();
                     target = null;
                     foodpcrl = false;
                     isfood = false;
@@ -176,10 +192,6 @@ public class PedreslaPlayer : Player
                     else
                     {
                         //StartTurbo();
-                        if (this.Life < 50)
-                            StartTurbo();
-                        else
-                            StopTurbo();
 
                         StartMove(target.Value);
 
