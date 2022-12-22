@@ -15,14 +15,21 @@ public class Noia : Player
 
     bool isloading = false;
     bool findWay = false;
-    bool turretMode = true;
+    bool turretMode = false;
+    bool inCorner = false;
+    bool moving = false;
+
 
     PointF topLeft = new PointF(0, 0);
     PointF topRight = new PointF(screenWidth, 0);
     PointF botLeft = new PointF(0, screenHeigth);
     PointF botRight = new PointF(screenWidth, screenHeigth);
 
+    int bulletCounter = 0;
+    int maxBullets = 50;
+
     int offset = 10;
+    int restCount = 0;
 
     // List<PointF> pontos = new List<PointF> { new PointF(0, 0), new PointF(screenWidth, 0), new PointF(0, screenHeigth), new PointF(screenWidth, screenHeigth)};
 
@@ -30,20 +37,25 @@ public class Noia : Player
 
     protected override void loop()
     {
+        List<PointF> pontos = new List<PointF> { topLeft, topRight, botRight, botLeft };
 
-        // StopMove();
-        StartTurbo();
 
-        if (Energy < 10)
+        if (Energy < 50)
         {
-            StopMove();
+            StopTurbo();
+            bulletCounter = maxBullets;
+            turretMode = false;
             isloading = true;
+        } else {
+            
         }
 
         if (isloading)
         {
-            if (Energy > 30)
+            if (Energy > 40)
+            {
                 isloading = false;
+            }
             else return;
         }
 
@@ -51,12 +63,21 @@ public class Noia : Player
         if ((Location.X >= pontoSelecionado.X - 10 && Location.X <= pontoSelecionado.X + 10)
             && (Location.Y >= pontoSelecionado.Y - 10 && Location.Y <= pontoSelecionado.Y + 10))
         {
+            // if(shootCounter == 50)
+            //     shootCounter = 0;
+            if(bulletCounter == maxBullets)
+            {
+                inCorner = true;
+                turretMode = false;
+            }
+            else
+                turretMode = true;
             StopMove();
-            turretMode = true;
         }
 
         if (!findWay)
         {
+            turretMode = false;
             if (Location.X < screenWidth / 2 && Location.Y < screenHeigth / 2)
             {
                 StartMove(topLeft);
@@ -84,13 +105,27 @@ public class Noia : Player
             findWay = true;
         }
 
+        if(inCorner && !turretMode)
+        {
+            var index = pontos.IndexOf(pontoSelecionado) + 1;
+            if(index >= pontos.Count)
+                index = 0;
+            
+            pontoSelecionado = pontos[index];
+            StartMove(pontoSelecionado);
+            
+            inCorner = false;
+            bulletCounter = 0;
+        }
 
-        if (Energy > 60 && turretMode)
+        if (bulletCounter < maxBullets && turretMode)
         {
             SizeF direction = new SizeF(
-                (float)Math.Cos((3f * i++) * (2 * Math.PI) / 360),
-                (float)Math.Sin((3f * i++) * (2 * Math.PI) / 360)
+                (float)Math.Cos((5f * i++) * (2 * Math.PI) / 360),
+                (float)Math.Sin((5f * i++) * (2 * Math.PI) / 360)
             );
+
+            bulletCounter++;
 
             if(pontoSelecionado == botRight)
             {
