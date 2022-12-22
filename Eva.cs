@@ -6,8 +6,8 @@ public class Eva : Player
     public Eva(PointF location) :
         base(location, Color.GreenYellow, Color.SlateBlue, "Autobosts")
     { 
-        int width = 1920;
-        int height = 1080;
+        int width = 1200;
+        int height = 800;
 
         isEsq = this.Location.X <= width / 2;
         isTop = this.Location.Y <= height / 2;
