@@ -6,8 +6,8 @@ public class Eva : Player
     public Eva(PointF location) :
         base(location, Color.Blue, Color.Red, "Autobosts")
     { 
-        int width = 1500;
-        int height = 1000;
+        int width = 1280;
+        int height = 800;
 
         isEsq = this.Location.X <= width / 2;
         isTop = this.Location.Y <= height / 2;
@@ -18,42 +18,40 @@ public class Eva : Player
 
         if (isEsq && isTop)
         {
-            destFinal = new PointF(0,0);
-            corrX = 100;
-            corrY = 100;
+            destFinal = new PointF(0, 0);
+            corrX = 20;
+            corrY = 20;
             quadShoot = 0;
         }
         else if (isEsq && !isTop)
         {
-            destFinal = new PointF(0,height);
-            corrX = 100;
-            corrY = 100;
+            destFinal = new PointF(0, height);
+            corrX = 20;
+            corrY = 20;
             quadShoot = 3;
         }
         else if (!isEsq && isTop)
         {
             destFinal = new PointF(width, 0);
-            corrX = -100;
-            corrY = 100;
+            corrX = -20;
+            corrY = 20;
             quadShoot = 1;
         }
         else
         {
             destFinal = new PointF(width, height);
-            corrX = -100;
-            corrY = -100;
+            corrX = -20;
+            corrY = -20;
             quadShoot = 2;
         }
 
-        destStart = new PointF(destFinal.X + corrX, destFinal.Y + corrY);
-        angles[0] = new int[2] {0, 90};
-        angles[1] = new int[2] {91, 180};
-        angles[2] = new int[2] {181, 270}; 
-        angles[3] = new int[2] {271, 359};
-
-        Corr = new PointF((int)rand.NextInt64(50), (int)rand.NextInt64(50));
+        destStart = new PointF(destFinal.X, destFinal.Y);
+        angles[0] = new int[2] {-3, 93};
+        angles[1] = new int[2] {91, 183};
+        angles[2] = new int[2] {179, 273}; 
+        angles[3] = new int[2] {272, 363};
     }
-    int mod = 0;
+    int mod = 1;
     int tiro = 0;
     int index = 0;
     int frame = 0;
@@ -65,49 +63,62 @@ public class Eva : Player
     public PointF destStart { get; private set; }
     public int[][] angles { get; private set; } = new int[4][];
     Random rand = new Random();
+    double lastLife = 0;
+    SizeF? runDirection = null;
+    int runCount = 0;
     protected override void loop()
     {
-        if (this.Energy <= 10)
-            mod = 2;
-        if (mod == 0)
+        if (runCount > 0)
+            runCount++;
+        
+        if (runCount == 20)
+        {
+            runDirection = new SizeF(runDirection.Value.Height, -runDirection.Value.Width);
+            StartMove(runDirection.Value);
+        }
+        else if (runCount > 40)
+        {
+            runDirection = null;
+            StopMove();
+            StopTurbo();
+            runCount = 0;
+            mod = 0;
+        }
+        else if (lastLife > Life)
         {
             StartTurbo();
-            StartMove(destStart);
-            if (this.Location
-            .isInside (
-                    new PointF (
-                        destStart.X - 75, destStart.Y - 75
-                    ),
-                    new PointF (
-                        destStart.X + 70, destStart.Y + 70
-                    )
-                ))
-            {
-                mod = 1;
-                StopMove();
-                StopTurbo();
-            }
-            return;
+            runCount++;
+            float dx = this.Location.X - LastDamage.Value.X;
+            float dy = this.Location.Y - LastDamage.Value.Y;
+            runDirection = new SizeF(dx,dy);
+
+            StartMove(runDirection.Value);
         }
+        lastLife = Life;
+
+        if (this.Energy <= 10)
+            mod = 2;
+       
 
         if (mod == 1)
         {
             if (angles[quadShoot][0] + index * 2 >= angles[quadShoot][1])
                 index = 0;
-            InfraRedSensor(angles[quadShoot][0] + index * 2);
+            
+            if (frame % 2 == 0)
+                InfraRedSensor(angles[quadShoot][0] + index * 2);
             index++;
 
             if (EnemiesInInfraRed.Count >= 1 && enemy == null)
-            {
                 enemy = EnemiesInInfraRed[0];
-            }
+            
 
-            if (enemy != null && tiro < 10)
+            if (enemy != null && tiro < 5)
             {
                 Shoot(enemy.Value);
                 tiro++;
             }
-            if (tiro == 10)
+            if (tiro == 5)
             {
                 enemy = null;
                 tiro = 0;
@@ -115,15 +126,10 @@ public class Eva : Player
         }
 
         frame++;
-        if (frame % 40 == 0)
-        {
-            PointF x = new PointF(this.destStart.X + (int)rand.NextInt64(50 + (int)Corr.X), this.destStart.Y + (int)rand.NextInt64(50 + (int)Corr.Y));
-            StartMove(x);
-        }
 
-        else if (frame >= 20*60)
+        if (frame >= 20*22)
         {
-            StartMove(new PointF(1200/2, 800/2));
+            StartMove(new PointF(1280/2, 800/2));
         }
         
 
