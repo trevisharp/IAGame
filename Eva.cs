@@ -4,10 +4,10 @@ using System.Drawing;
 public class Eva : Player
 {
     public Eva(PointF location) :
-        base(location, Color.GreenYellow, Color.SlateBlue, "Autobosts")
+        base(location, Color.Blue, Color.Red, "Autobosts")
     { 
-        int width = 1200;
-        int height = 800;
+        int width = 1500;
+        int height = 200;
 
         isEsq = this.Location.X <= width / 2;
         isTop = this.Location.Y <= height / 2;
@@ -85,6 +85,7 @@ public class Eva : Player
             {
                 mod = 1;
                 StopMove();
+                StopTurbo();
             }
             return;
         }
@@ -116,14 +117,20 @@ public class Eva : Player
         frame++;
         if (frame % 40 == 0)
         {
-            PointF x = new PointF(this.destStart.X + (int)rand.NextInt64(250 + (int)Corr.X), this.destStart.Y + (int)rand.NextInt64(250 + (int)Corr.Y));
+            PointF x = new PointF(this.destStart.X + (int)rand.NextInt64(50 + (int)Corr.X), this.destStart.Y + (int)rand.NextInt64(50 + (int)Corr.Y));
             StartMove(x);
         }
 
+        else if (frame >= 20*60)
+        {
+            StartMove(new PointF(1200/2, 800/2));
+        }
         
 
         if (mod == 2) {
             StopTurbo();
+            if (this.Energy >= 30)
+                mod = 1;
         }
         
 
