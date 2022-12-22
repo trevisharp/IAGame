@@ -10,6 +10,7 @@ public class PedreslaPlayer : Player
     int frame = 0;
     int countShoot = 0;
     private PointF? target = null;
+    private PointF? targetshot = null;
     PointF ponto = new PointF();
     PointF? flagDamage = null;
 
@@ -118,11 +119,14 @@ public class PedreslaPlayer : Player
             }
 
             if (EntitiesInAccurateSonar.Count != 0)
+            {
+                InfraRedSensor(EntitiesInAccurateSonar[searchindex++ % EntitiesInAccurateSonar.Count]);
                 isfood = true;
+            }
                 //this.temptarget = EntitiesInAccurateSonar;
                 //this.target = EntitiesInAccurateSonar[0];
 
-            if (timestopped == 10)
+            if (timestopped == 2)
             {
                 timestopped = 0;
                 sonarrunning = true;
@@ -135,12 +139,25 @@ public class PedreslaPlayer : Player
 
                 if(countShoot <= 10 && !foodpcrl)
                 {
-                    if (frame % 3 == 0)
+                    if (frame % 2 == 0)
                     {
                         Shoot(target.Value);
                         countShoot++;
                     }
                 }
+
+                if(countShoot >= 10)
+                {
+                    target = null;
+                    foodpcrl = false;
+                    isfood = false;
+                    sonarrunning = false;
+                    //ResetInfraRed();
+                    countShoot = 0;
+                    StopMove();
+                    AccurateSonar();
+                }
+
                 else
                 {
 
@@ -159,6 +176,11 @@ public class PedreslaPlayer : Player
                     else
                     {
                         //StartTurbo();
+                        if (this.Life < 50)
+                            StartTurbo();
+                        else
+                            StopTurbo();
+
                         StartMove(target.Value);
 
                     }
