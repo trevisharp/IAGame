@@ -180,7 +180,7 @@ public abstract class Player
 
     public void ReciveDamage(PointF bomb)
     {
-        Life -= 0;
+        Life -= 15;
         this.LastDamage = bomb;
     }
 
