@@ -7,7 +7,7 @@ public class Eva : Player
         base(location, Color.Blue, Color.Red, "Autobosts")
     { 
         int width = 1500;
-        int height = 200;
+        int height = 1000;
 
         isEsq = this.Location.X <= width / 2;
         isTop = this.Location.Y <= height / 2;
