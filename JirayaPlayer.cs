@@ -18,16 +18,19 @@ public class JirayaPlayer : Player
     PointF? enemy = null;
     bool isloading = false;
     int giro = 0;
+    PointF topLeft = new PointF(0, 0);
 
     protected override void loop()
     {
+        StartMove(topLeft);
+        
         if (Energy > 10)
         {
-            if (FoodsInInfraRed.Count > 0 && EnemiesInInfraRed.Count > 0) 
-            {
-                
-                StartMove(FoodsInInfraRed[0]);
-            }
+
+            // if (FoodsInInfraRed.Count > 0 && EnemiesInInfraRed.Count > 0) 
+            // {
+            //     StartMove(FoodsInInfraRed[0]);
+            // }
 
             if (EnemiesInInfraRed.Count > 0)
             {
@@ -118,7 +121,7 @@ public class JirayaPlayer : Player
                     enemy = EnemiesInInfraRed[0];
                 }
 
-                else if (enemy != null && Energy > 10)
+                else if (enemy != null && Energy > 10 || Location == topLeft)
                 {
                     float dx = enemy.Value.X - this.Location.X,
                           dy = enemy.Value.Y - this.Location.Y;
