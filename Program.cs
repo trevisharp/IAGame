@@ -31,7 +31,7 @@ Bitmap bmp = null;
 Graphics g = null;
 
 Timer tm = new Timer();
-tm.Interval = 25;
+tm.Interval = 50;
 
 form.Load += delegate
 {
