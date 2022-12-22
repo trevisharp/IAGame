@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class Noia : Player
 {
     public Noia(PointF location) :
-        base(location, Color.Green, Color.Red, "Nóia")
+        base(location, Color.Green, Color.LightSeaGreen, "Nóia")
     { }
 
     int i = 0;
@@ -18,7 +18,8 @@ public class Noia : Player
     bool turretMode = false;
     bool inCorner = false;
     bool moving = false;
-
+    
+    PointF? ultimoDano = null;
 
     PointF topLeft = new PointF(0, 0);
     PointF topRight = new PointF(screenWidth, 0);
@@ -31,9 +32,9 @@ public class Noia : Player
     int offset = 10;
     int restCount = 0;
 
-    // List<PointF> pontos = new List<PointF> { new PointF(0, 0), new PointF(screenWidth, 0), new PointF(0, screenHeigth), new PointF(screenWidth, screenHeigth)};
 
     PointF pontoSelecionado;
+
 
     protected override void loop()
     {
@@ -59,6 +60,15 @@ public class Noia : Player
             else return;
         }
 
+        if(LastDamage != ultimoDano)
+        {   
+            bulletCounter = maxBullets;
+            StartTurbo();
+            pontos.Reverse();       
+            inCorner = true;
+            turretMode = false;     
+            ultimoDano = LastDamage;
+        }
 
         if ((Location.X >= pontoSelecionado.X - 10 && Location.X <= pontoSelecionado.X + 10)
             && (Location.Y >= pontoSelecionado.Y - 10 && Location.Y <= pontoSelecionado.Y + 10))
