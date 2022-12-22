@@ -13,9 +13,14 @@ public class PedreslaPlayer : Player
     PointF ponto = new PointF();
     PointF? flagDamage = null;
 
+    int timestopped = 0;
+
     int searchindex = 0;
     int points = 0;
     bool reset = true;
+    bool sonarrunning = false;
+    bool isfood = false;
+    bool foodpcrl = false;
 
     protected override void loop()
     {
@@ -59,20 +64,76 @@ public class PedreslaPlayer : Player
 
     // }
 
+    if(sonarrunning)
+    {
+        if (EnemiesInInfraRed.Count > 0)
+        {
+            target = EnemiesInInfraRed[0];
+        }
+        else
+            target = null;
         
 
+        if (target == null)
+            InfraRedSensor(5f * frame++);
+        
+        else
+        {
+            sonarrunning = false;
+            timestopped = 0;
+
+        }
+    }
+        
+
+
+    if (isfood)
+    {
+        if (FoodsInInfraRed.Count == 0)
+        {
+            foodpcrl = false;
+            InfraRedSensor(EntitiesInAccurateSonar[searchindex++ % EntitiesInAccurateSonar.Count]);
+            //this.target = EnemiesInInfraRed[0];
+        }
+
+        else
+        {
+            isfood = false;
+            this.target = FoodsInInfraRed[0];
+            foodpcrl = true;
+        }
+    }
+    
+    
+
+    if (!sonarrunning)
+    {
 
         if (target == null)
         {
             if (frame % 5 == 0)
+            {
                 AccurateSonar();
+                timestopped++;
+            }
+
             if (EntitiesInAccurateSonar.Count != 0)
-                this.target = EntitiesInAccurateSonar[0];
+                isfood = true;
+                //this.temptarget = EntitiesInAccurateSonar;
+                //this.target = EntitiesInAccurateSonar[0];
+
+            if (timestopped == 10)
+            {
+                timestopped = 0;
+                sonarrunning = true;
+            }
+
         }
         else
         {
- 
-                if(countShoot <= 10)
+
+
+                if(countShoot <= 10 && !foodpcrl)
                 {
                     if (frame % 3 == 0)
                     {
@@ -86,6 +147,10 @@ public class PedreslaPlayer : Player
                     if (checkPosition())
                     {
                         target = null;
+                        foodpcrl = false;
+                        isfood = false;
+                        sonarrunning = false;
+                        //ResetInfraRed();
                         countShoot = 0;
                         StopMove();
                         AccurateSonar();
@@ -99,21 +164,17 @@ public class PedreslaPlayer : Player
                     }
 
                 }
-            }
+        }
 
 
         }
 
-        
+    }
         
 
     private bool checkPosition(float range = 5f)
-    {
-        if((this.Location.X <= this.target.Value.X + range && this.Location.X >= this.target.Value.X - range) && (this.Location.Y <= this.target.Value.Y - range && this.Location.Y <= this.target.Value.Y + range))
-        {
-            return true;
-        }
-        return false;
-    }
-
+        => (this.Location.X <= this.target.Value.X + range
+        && this.Location.X >= this.target.Value.X - range)
+        && (this.Location.Y >= this.target.Value.Y - range
+        && this.Location.Y <= this.target.Value.Y + range);
 }
