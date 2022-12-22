@@ -1,10 +1,12 @@
 using System;
+using System.Linq;
 using System.Drawing;
+using System.Collections.Generic;
 
 public class Feshow : Player
 {
     public Feshow(PointF location) : 
-        base(location, Color.White, Color.Red, "Feshow") { }
+        base(location, Color.DarkSalmon, Color.DarkRed, "In(fernal)") { }
 
     int i = 0;
     int frame = 0;
@@ -16,178 +18,59 @@ public class Feshow : Player
     PointF? enemyLast = new PointF();
     bool isloading = false;
     Point point = new Point();
-
-    bool atack = false;
-    bool move = true;
-    bool search = false;
-    bool wait = false;
-    double currentLife = 100;
-
+    int ind = 0;
     protected override void loop()
     {
-        if (wait)
-        {
-            currentFrame++;
-            frame++;
-            
-            if ((currentFrame % 3) == 0)
-            {
-                wait = false;
-                search = true;
-            }   
+        frame++;
+    
+        List<Point> pontos = new List<Point>();
 
+        Point point1 = new Point(0, 0);
+        Point point2 = new Point(0, 800);
+        Point point3 = new Point(1280, 0);
+        Point point4 = new Point(1280, 800);
 
-            return;
-        }
+        Point point5 = new Point(0, 400);
+        Point point6 = new Point(640, 800);
+        Point point7 = new Point(1280, 400);
+        Point point8 = new Point(640, 0);
+
+        Point point9 = new Point(0, 200);
+        Point point10 = new Point(0, 600);
+        Point point11 = new Point(320, 800);
+        Point point12 = new Point(960, 800);
+        Point point13 = new Point(1280, 600);
+        Point point14 = new Point(1280, 200);
+        Point point15 = new Point(960, 0);
+        Point point16 = new Point(320, 0);
+
+        pontos.Add(point1);
+        pontos.Add(point2);
+        pontos.Add(point3);
+        pontos.Add(point4);
+        pontos.Add(point5);
+        pontos.Add(point6);
+        pontos.Add(point7);
+        pontos.Add(point8);
+        pontos.Add(point9);
+        pontos.Add(point10);
+        pontos.Add(point11);
+        pontos.Add(point12);
+        pontos.Add(point13);
+        pontos.Add(point14);
+        pontos.Add(point15);
+        pontos.Add(point16);
         
-        if (move)
+
+        ind += 1;
+        if (ind == pontos.Count())
         {
-            if(Location.X > 640 && Location.Y > 400)
-            {
-                point.X = 1260;
-                point.Y = 780;
-            } else if(Location.X > 640 && Location.Y < 400)
-            {
-                point.X = 1260;
-                point.Y = 20;
-            } else if(Location.X < 640 && Location.Y > 400)
-            {
-                point.X = 20;
-                point.Y = 780;
-            } else if(Location.X < 640 && Location.Y < 400)
-            {
-                point.X = 20;
-                point.Y = 20;
-            }
-
-            StartTurbo();
-            StartMove(point);
-            float dx = Location.X - point.X;
-            dx = dx < 0 ? -dx : dx;
-            float dy = Location.Y - point.Y;
-            dy = dy < 0 ? -dy : dy;
-            
-            PointF pt = new PointF(dx, dy);
-
-            if (pt.X <= 2 && pt.Y <= 2)
-            {
-                move = false;
-                StopTurbo();
-                StopMove();
-                atack = true;
-            }
+            ind = 0;
         }
 
-        if (search)
+        if (Energy > 5)
         {
-                if (EnemiesInInfraRed.Count > 0)
-                {
-                    enemy = EnemiesInInfraRed[0];
-                }
-                else
-                {
-                    enemy = null;
-                }
-                if (Energy < 10)
-                {
-                    isloading = true;
-                    enemy = null;
-                }
-                if (isloading)
-                {
-                    if (Energy > 60)
-                        isloading = false;
-                    else return;
-                }
-                if (enemy == null && Energy > 10)
-                    InfraRedSensor(5f * i++);
-                if (enemy != null && Energy > 10)
-                {
-                    search = false;
-                    atack = true;
-                }
-        }
-
-        if (atack)
-        {
-            if(Energy > 40)
-            {
-                if (EnemiesInInfraRed.Count > 0)
-                {
-                    enemy = EnemiesInInfraRed[0];
-                }
-                else
-                {
-                    enemy = null;
-                }
-                if (Energy < 10)
-                {
-                    isloading = true;
-                    enemy = null;
-                }
-                if (isloading)
-                {
-                    if (Energy > 60)
-                        isloading = false;
-                    else return;
-                }
-                if (enemy == null && Energy > 10)
-                    InfraRedSensor(5f * i++);
-                else if (enemy != null && Energy > 10)
-                {
-                    InfraRedSensor(enemy.Value);
-                    float dx = enemy.Value.X - this.Location.X,
-                        dy = enemy.Value.Y - this.Location.Y;
-                    if (dx * dx + dy * dy >= 2000f * 2000f)
-                        {
-                            frame++;
-                            if (Energy < 10 || frame % 10 == 0)
-                                return;
-                            if (EntitiesInStrongSonar == 0)
-                            {
-                                StrongSonar();
-                                points = Points;
-                                return;
-                            }
-                            else if (EntitiesInAccurateSonar.Count == 0)
-                            {
-                                AccurateSonar();
-                                return;
-                            }
-                            else if (FoodsInInfraRed.Count == 0)
-                            {
-                            
-                                InfraRedSensor(EntitiesInAccurateSonar[searchindex++ % EntitiesInAccurateSonar.Count]);
-                                return;
-                            }
-                        }
-                    else
-                    {
-                        PointF alvo = new PointF();
-
-                        if ((enemyLast.Value != enemy.Value) && (enemyLast != null))
-                        {
-                            alvo.X = (enemy.Value.X + (enemy.Value.X - enemyLast.Value.X )*25);
-                            alvo.Y = (enemy.Value.Y + (enemy.Value.Y - enemyLast.Value.Y )*25); 
-                        }
-                        else
-                        {
-                            alvo.X = enemy.Value.X;
-                            alvo.Y = enemy.Value.Y;
-                        }
-                        Shoot(alvo);
-
-                        enemyLast = enemy.Value;
-
-                        atack = false;
-                        search = false;
-                        wait = true;
-                        currentFrame = 0;
-                        return;
-                    }
-                }
-            }
-
+            Shoot(pontos[ind]);
         }
         
     }
