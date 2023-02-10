@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 
-public class Noia : Player
+public class Maluco : Player
 {
     public Noia(PointF location) :
         base(location, Color.Green, Color.LightSeaGreen, "Maluco")
