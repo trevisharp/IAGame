@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Maluco : Player
 {
-    public Noia(PointF location) :
+    public Maluco(PointF location) :
         base(location, Color.Green, Color.LightSeaGreen, "Maluco")
     { }
 
