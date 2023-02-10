@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 public abstract class Player
 {
@@ -97,7 +98,7 @@ public abstract class Player
         float mod = (float)Math.Sqrt(p.X * p.X + p.Y * p.Y);
         if (mod == 0)
             Velocity = SizeF.Empty;
-        Velocity = new SizeF(p.X / mod, p.Y / mod);
+        Velocity = new SizeF(2 * p.X / mod, 2 * p.Y / mod);
         moving = true;
     }
 
@@ -179,7 +180,7 @@ public abstract class Player
 
     public void ReciveDamage(PointF bomb)
     {
-        Life -= 20;
+        Life -= 15;
         this.LastDamage = bomb;
     }
 
@@ -187,6 +188,9 @@ public abstract class Player
         List<Player> allplayers, List<PointF> allfoods, 
         List<Bomb> allbombs, int i)
     {
+        allplayers = allplayers
+            .Where(p => !p.IsBroked)
+            .ToList();
         float dx, dy;
         loop();
         Draw(g);
@@ -297,7 +301,7 @@ public abstract class Player
         if (shooting)
         {
             shooting = false;
-            Energy -= 10 * dt;
+            Energy -= 20 * dt;
             SizeF speed = new SizeF(shootingpoint.Value.X -this.Location.X,
                 shootingpoint.Value.Y -this.Location.Y);
             speed = 50f * speed / (float)Math.Sqrt(
@@ -334,8 +338,8 @@ public abstract class Player
                 allfoods.RemoveAt(f);
                 f--;
                 this.Points++;
-                this.LifeRegeneration += .25f;
-                this.EnergyRegeneration += .25f;
+                this.LifeRegeneration += .5f;
+                this.EnergyRegeneration += .5f;
             }
         }
 
