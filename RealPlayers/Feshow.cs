@@ -3,6 +3,7 @@ using System.Linq;
 using System.Drawing;
 using System.Collections.Generic;
 
+[Ignore]
 public class Feshow : Player
 {
     public Feshow(PointF location) : 

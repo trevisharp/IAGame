@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 
+[Ignore]
 public class JirayaPlayer : Player
 {
     public Random rand { get; set; } = new Random();

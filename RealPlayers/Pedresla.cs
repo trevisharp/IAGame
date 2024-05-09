@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 
+[Ignore]
 public class PedreslaPlayer : Player
 {
     public PedreslaPlayer(PointF location) : 

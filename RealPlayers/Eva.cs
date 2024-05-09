@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 
+[Ignore]
 public class Eva : Player
 {
     public Eva(PointF location) :

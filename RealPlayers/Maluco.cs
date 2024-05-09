@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 
+[Ignore]
 public class Maluco : Player
 {
     public Maluco(PointF location) :
